@@ -21,6 +21,13 @@ int main() {
 
     connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
+        printf("✅ Cliente conectado correctamente al servidor\n");
+    } else {
+        perror("❌ Error al conectar con el servidor");
+        exit(EXIT_FAILURE);
+    }
+
     while (1) {
         printf("Ingresa una palabra: ");
         fgets(input, sizeof(input), stdin);
