@@ -8,6 +8,21 @@
 #define PORT 8080
 #define MAX_WORD_LEN 6
 
+// Funcion palabra
+void evaluar_palabra(const char *secreta, const char *intento, char *resultado) {
+    int len = strlen(secreta);
+    for (int i = 0; i < len; i++) {
+        if (intento[i] == secreta[i]) {
+            resultado[i] = 'G'; // Green
+        } else if (strchr(secreta, intento[i])) {
+            resultado[i] = 'Y'; // Yellow
+        } else {
+            resultado[i] = '-'; // Gris
+        }
+    }
+    resultado[len] = '\0';
+}
+
 // Paso 2: Función principal del servidor
 int main() {
     int server_fd, new_socket;
@@ -53,17 +68,4 @@ int main() {
     return 0;
 }
 
-void evaluar_palabra(const char *secreta, const char *intento, char *resultado) {
-    int len = strlen(secreta);
-    for (int i = 0; i < len; i++) {
-        if (intento[i] == secreta[i]) {
-            resultado[i] = 'G'; // Green
-        } else if (strchr(secreta, intento[i])) {
-            resultado[i] = 'Y'; // Yellow
-        } else {
-            resultado[i] = '-'; // Gris
-        }
-    }
-    resultado[len] = '\0';
-}
 
