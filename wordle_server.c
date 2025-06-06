@@ -1,14 +1,21 @@
-// Paso 1: Includes y configuración
+
+// wordle_server.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
-#define PORT 8080
+#define MAX_CONN 5
 #define MAX_WORD_LEN 6
+#define BUFFER_SIZE 1024
 
-// Funcion palabra
+int descriptor_socket_servidor, descriptor_socket_cliente;
+
 void evaluar_palabra(const char *secreta, const char *intento, char *resultado) {
     int len = strlen(secreta);
     for (int i = 0; i < len; i++) {
@@ -17,55 +24,70 @@ void evaluar_palabra(const char *secreta, const char *intento, char *resultado) 
         } else if (strchr(secreta, intento[i])) {
             resultado[i] = 'Y'; // Yellow
         } else {
-            resultado[i] = '-'; // Gris
+            resultado[i] = '-'; // Gray
         }
     }
     resultado[len] = '\0';
 }
 
-// Paso 2: Función principal del servidor
-int main() {
-    int server_fd, new_socket;
-    struct sockaddr_in address;
-    int opt = 1, addrlen = sizeof(address);
-    char buffer[1024] = {0};
-    char secret_word[MAX_WORD_LEN] = "APPLE";
+void catch(int sig) {
+    printf("\n*** Señal %d capturada. Cerrando servidor...\n", sig);
+    close(descriptor_socket_cliente);
+    close(descriptor_socket_servidor);
+    exit(0);
+}
 
-    // Paso 3: Crear socket TCP
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
-    
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY; // Escuchar todas las interfaces
-    address.sin_port = htons(PORT);
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Uso: %s <puerto>\n", argv[0]);
+        return 1;
+    }
 
-    // Paso 4: Enlazar y escuchar
-    bind(server_fd, (struct sockaddr *)&address, sizeof(address));
-    listen(server_fd, 3);
+    struct sockaddr_in socket_servidor, socket_cliente;
+    socklen_t cliente_len = sizeof(socket_cliente);
+    char buffer[BUFFER_SIZE];
+    char resultado[MAX_WORD_LEN + 1];
+    char secret_word[MAX_WORD_LEN + 1] = "APPLE";
 
-    printf("Servidor esperando conexiones...\n");
-    new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-    printf("Cliente conectado.\n");
+    signal(SIGINT, catch);
+
+    descriptor_socket_servidor = socket(AF_INET, SOCK_STREAM, 0);
+    if (descriptor_socket_servidor < 0) {
+        perror("Socket");
+        exit(1);
+    }
+
+    socket_servidor.sin_family = AF_INET;
+    socket_servidor.sin_addr.s_addr = INADDR_ANY;
+    socket_servidor.sin_port = htons(atoi(argv[1]));
+
+    if (bind(descriptor_socket_servidor, (struct sockaddr*)&socket_servidor, sizeof(socket_servidor)) < 0) {
+        perror("Bind");
+        exit(1);
+    }
+
+    listen(descriptor_socket_servidor, MAX_CONN);
+    printf("Servidor esperando conexiones en puerto %s...\n", argv[1]);
+
+    descriptor_socket_cliente = accept(descriptor_socket_servidor, (struct sockaddr*)&socket_cliente, &cliente_len);
+    if (descriptor_socket_cliente < 0) {
+        perror("Accept");
+        exit(1);
+    }
+
+    printf("Cliente conectado desde %s\n", inet_ntoa(socket_cliente.sin_addr));
 
     while (1) {
         memset(buffer, 0, sizeof(buffer));
-        int valread = read(new_socket, buffer, 1024);
+        int valread = recv(descriptor_socket_cliente, buffer, BUFFER_SIZE, 0);
         if (valread <= 0) break;
-    
-        // Mostrar lo que el cliente envió
-        printf("Cliente dijo: %s\n", buffer);
-    
-        // Evaluar la palabra
-        char resultado[MAX_WORD_LEN + 1];
-        evaluar_palabra(secret_word, buffer, resultado);
-    
-        // Enviar respuesta al cliente
-        send(new_socket, resultado, strlen(resultado), 0);
-    }    
 
-    close(new_socket);
-    close(server_fd);
+        printf("Cliente dijo: %s\n", buffer);
+        evaluar_palabra(secret_word, buffer, resultado);
+        send(descriptor_socket_cliente, resultado, strlen(resultado), 0);
+    }
+
+    close(descriptor_socket_cliente);
+    close(descriptor_socket_servidor);
     return 0;
 }
-
-

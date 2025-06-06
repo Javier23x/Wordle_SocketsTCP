@@ -1,42 +1,52 @@
+
+// wordle_client.c
 #include <stdio.h>
-#include <sys/socket.h>
 #include <stdlib.h>
-#include <netinet/in.h>
 #include <string.h>
-#include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
-#define PORT 8080
+#define BUFFER_SIZE 1024
 
-int main() {
-    int sock = 0;
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Uso: %s <IP servidor> <puerto>\n", argv[0]);
+        return 1;
+    }
+
+    int sock;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = {0};
+    char buffer[BUFFER_SIZE] = {0};
     char input[100];
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-    inet_pton(AF_INET, "10.0.2.15", &serv_addr.sin_addr); // Cambiar IP si es remoto
-
-    connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
-        printf("✅ Cliente conectado correctamente al servidor\n");
-    } else {
-        perror("❌ Error al conectar con el servidor");
-        exit(EXIT_FAILURE);
+    if (sock < 0) {
+        perror("Socket");
+        return 1;
     }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(atoi(argv[2]));
+    inet_pton(AF_INET, argv[1], &serv_addr.sin_addr);
+
+    if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+        perror("Connect");
+        return 1;
+    }
+
+    printf("Conectado al servidor %s:%s\n", argv[1], argv[2]);
 
     while (1) {
         printf("Ingresa una palabra: ");
         fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = 0; // Quitar newline
+        input[strcspn(input, "\n")] = 0;
 
         send(sock, input, strlen(input), 0);
-        int valread = read(sock, buffer, 1024);
+        int valread = read(sock, buffer, BUFFER_SIZE);
         buffer[valread] = '\0';
-        printf("Servidor dice: %s\n", buffer);
+        printf("Servidor responde: %s\n", buffer);
     }
 
     close(sock);
