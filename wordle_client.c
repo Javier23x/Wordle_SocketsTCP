@@ -17,7 +17,7 @@ int main() {
     sock = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
-    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr); // Cambiar IP si es remoto
+    inet_pton(AF_INET, "10.0.2.15", &serv_addr.sin_addr); // Cambiar IP si es remoto
 
     connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 
