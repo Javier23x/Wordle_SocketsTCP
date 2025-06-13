@@ -15,7 +15,7 @@ void actualizar_abecedario(char *abecedario, const char *intento, const char *re
         if (resultado[i] == '-') {
             for (int j = 0; j < 26; j++) {
                 if (abecedario[j] == intento[i]) {
-                    abecedario[j] = '.'; // Marcamos como descartada
+                    abecedario[j] = '.'; 
                     break;
                 }
             }
@@ -26,7 +26,7 @@ void actualizar_abecedario(char *abecedario, const char *intento, const char *re
 void convertir_a_mayusculas(char *str) {
     for (int i = 0; str[i]; i++) {
         if (str[i] >= 'a' && str[i] <= 'z') {
-            str[i] -= 32;  // Convertimos a mayúscula
+            str[i] -= 32;  
         }
     }
 }
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         actualizar_abecedario(letras_disponibles, input, buffer);
         printf("Letras disponibles: %s\n", letras_disponibles);
 
-        // Si acertó, mostrar mensaje y cerrar
+        // Si acierta, mostrar mensaje y cerrar
         if (strcmp(buffer, "GGGGG") == 0) {
             printf("🎉 ¡Acertaste la palabra!\n");
             break;
