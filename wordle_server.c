@@ -53,6 +53,19 @@ void convertir_a_mayusculas(char *str) {
     }
 }
 
+void actualizar_abecedario(char *abecedario, const char *intento, const char *resultado) {
+    for (int i = 0; i < 5; i++) {
+        if (resultado[i] == '-') {
+            for (int j = 0; j < 26; j++) {
+                if (abecedario[j] == intento[i]) {
+                    abecedario[j] = '.'; 
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void catch(int sig) {
     printf("\n*** Señal %d capturada. Cerrando servidor...\n", sig);
     close(descriptor_socket_cliente);
@@ -94,32 +107,33 @@ int main(int argc, char *argv[]) {
     listen(descriptor_socket_servidor, MAX_CONN);
     printf("Servidor esperando conexiones en puerto %s...\n", argv[1]);
 
-    descriptor_socket_cliente = accept(descriptor_socket_servidor, (struct sockaddr*)&socket_cliente, &cliente_len);
-    if (descriptor_socket_cliente < 0) {
-        perror("Accept");
-        exit(1);
-    }
-
-    printf("Cliente conectado desde %s\n", inet_ntoa(socket_cliente.sin_addr));
-    printf("🔐 Palabra secreta elegida: %s\n", secret_word);
-
     while (1) {
-        memset(buffer, 0, sizeof(buffer));
-        int valread = recv(descriptor_socket_cliente, buffer, BUFFER_SIZE, 0);
-        if (valread <= 0) break;
-        
-        convertir_a_mayusculas(buffer);
-        printf("Cliente dijo: %s\n", buffer);
-        evaluar_palabra(secret_word, buffer, resultado);
-        send(descriptor_socket_cliente, resultado, strlen(resultado), 0);
-
-        if (strcmp(resultado, "GGGGG") == 0) {
-            printf("✅ Cliente acertó la palabra. Cerrando conexión.\n");
-            break;
+        descriptor_socket_cliente = accept(descriptor_socket_servidor, (struct sockaddr*)&socket_cliente, &cliente_len);
+        if (descriptor_socket_cliente < 0) {
+            perror("Accept");
+            continue;
         }
+    
+        strcpy(secret_word, palabras[rand() % TOTAL_PALABRAS]);
+        printf("\nNuevo cliente conectado desde %s\n", inet_ntoa(socket_cliente.sin_addr));
+        printf("🔐 Nueva palabra secreta: %s\n", secret_word);
+    
+        while (1) {
+            memset(buffer, 0, sizeof(buffer));
+            int valread = recv(descriptor_socket_cliente, buffer, BUFFER_SIZE, 0);
+            if (valread <= 0) break;
+    
+            convertir_a_mayusculas(buffer);
+            printf("Cliente dijo: %s\n", buffer);
+            evaluar_palabra(secret_word, buffer, resultado);
+            send(descriptor_socket_cliente, resultado, strlen(resultado), 0);
+    
+            if (strcmp(resultado, "GGGGG") == 0) {
+                printf("✅ Cliente acertó la palabra. Cerrando su conexión.\n");
+                break;
+            }
+        }
+    
+        close(descriptor_socket_cliente);
     }
-
-    close(descriptor_socket_cliente);
-    close(descriptor_socket_servidor);
-    return 0;
 }

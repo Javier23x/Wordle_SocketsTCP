@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 
     printf("Conectado al servidor %s:%s\n", argv[1], argv[2]);
     printf("Categoria: Frutas y vegetales. Palabras de 5 letras sin tildes.\n");
+    char letras_disponibles[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     while (1) {
         do {
@@ -55,6 +56,8 @@ int main(int argc, char *argv[]) {
         int valread = read(sock, buffer, BUFFER_SIZE);
         buffer[valread] = '\0';
         printf("Servidor responde: %s\n", buffer);
+        actualizar_abecedario(letras_disponibles, input, buffer);
+        printf("Letras disponibles: %s\n", letras_disponibles);
 
         // Si acertó, mostrar mensaje y cerrar
         if (strcmp(buffer, "GGGGG") == 0) {
