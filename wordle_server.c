@@ -53,19 +53,6 @@ void convertir_a_mayusculas(char *str) {
     }
 }
 
-void actualizar_abecedario(char *abecedario, const char *intento, const char *resultado) {
-    for (int i = 0; i < 5; i++) {
-        if (resultado[i] == '-') {
-            for (int j = 0; j < 26; j++) {
-                if (abecedario[j] == intento[i]) {
-                    abecedario[j] = '.'; 
-                    break;
-                }
-            }
-        }
-    }
-}
-
 void catch(int sig) {
     printf("\n*** Señal %d capturada. Cerrando servidor...\n", sig);
     close(descriptor_socket_cliente);

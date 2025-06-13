@@ -10,6 +10,19 @@
 
 #define BUFFER_SIZE 1024
 
+void actualizar_abecedario(char *abecedario, const char *intento, const char *resultado) {
+    for (int i = 0; i < 5; i++) {
+        if (resultado[i] == '-') {
+            for (int j = 0; j < 26; j++) {
+                if (abecedario[j] == intento[i]) {
+                    abecedario[j] = '.'; // Marcamos como descartada
+                    break;
+                }
+            }
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         printf("Uso: %s <IP servidor> <puerto>\n", argv[0]);
