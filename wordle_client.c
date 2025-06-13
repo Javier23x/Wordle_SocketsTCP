@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Conectado al servidor %s:%s\n", argv[1], argv[2]);
+    printf("Categoria: Frutas y vegetales. Palabras de 5 letras sin tildes.\n");
 
     while (1) {
         do {

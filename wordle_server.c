@@ -17,6 +17,21 @@
 
 int descriptor_socket_servidor, descriptor_socket_cliente;
 
+const char *palabras[] = {
+    "MANGO", "PERAS", "UVASO", "KIWIS", "NABOS", "COLIN", "RAMAS", "CEBOL", "TOMAS", "PAPAS",
+    "BANAN", "DATIL", "GUABA", "LIMON", "MELON", "PIÑA",  "CHILE", "REPOL", "PEREJ", "MAIZS",
+    "AJIES", "ENDIV", "APIOS", "RABAN", "ZAPAL", "FRESO", "MANZA", "MORAS", "NISPE", "PEPIN",
+    "ACELG", "BROCO", "CILAN", "COLZA", "ESPAR", "HABAS", "JITOM", "JENGI", "KALES", "LAURE",
+    "LECHO", "LENTE", "NABIZ", "OCIMO", "ORTIG", "PALTA", "PIMIE", "RUCUL", "TAMAR", "TRIGO",
+    "YACON", "YERBA", "YUCCA", "ZANAH", "ZARZA", "ACAYU", "AJIPA", "ALBAH", "ALGAS", "ANONA",
+    "AROMA", "BAYAS", "BEREN", "BOÑAT", "CAQUI", "CEREZ", "CHIRA", "CIRUE", "CLODO", "COCOA",
+    "GUIND", "GUYAB", "HIGOS", "HOJAS", "INGIR", "JUJUB", "LICHE", "LOLOS", "MADRO", "MELVA",
+    "MORON", "MORUS", "NABAL", "NANCE", "NECTA", "NUECE", "OLIVA", "PENCA", "POMAS", "PRUNO",
+    "QUINO", "RUBUS", "SALSA", "SANDI", "SOJAS", "SORGO", "SOTOL", "TACSO", "TOMIL", "ZARZL"
+};
+
+#define TOTAL_PALABRAS (sizeof(palabras)/sizeof(palabras[0]))
+
 void evaluar_palabra(const char *secreta, const char *intento, char *resultado) {
     int len = strlen(secreta);
     for (int i = 0; i < len; i++) {
@@ -54,7 +69,8 @@ int main(int argc, char *argv[]) {
     socklen_t cliente_len = sizeof(socket_cliente);
     char buffer[BUFFER_SIZE];
     char resultado[MAX_WORD_LEN + 1];
-    char secret_word[MAX_WORD_LEN + 1] = "APPLE";
+    srand(time(NULL));
+    char secret_word[MAX_WORD_LEN + 1] = strcpy(secret_word, palabras[rand() % TOTAL_PALABRAS]);;
 
     signal(SIGINT, catch);
 
