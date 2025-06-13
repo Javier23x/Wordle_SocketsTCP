@@ -23,6 +23,14 @@ void actualizar_abecedario(char *abecedario, const char *intento, const char *re
     }
 }
 
+void convertir_a_mayusculas(char *str) {
+    for (int i = 0; str[i]; i++) {
+        if (str[i] >= 'a' && str[i] <= 'z') {
+            str[i] -= 32;  // Convertimos a mayúscula
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         printf("Uso: %s <IP servidor> <puerto>\n", argv[0]);
@@ -64,6 +72,7 @@ int main(int argc, char *argv[]) {
             }
         } while (strlen(input) != 5);
         
+        convertir_a_mayusculas(input);
         send(sock, input, strlen(input), 0);
         
         int valread = read(sock, buffer, BUFFER_SIZE);
