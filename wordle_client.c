@@ -39,11 +39,18 @@ int main(int argc, char *argv[]) {
     printf("Conectado al servidor %s:%s\n", argv[1], argv[2]);
 
     while (1) {
-        printf("Ingresa una palabra: ");
-        fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = 0;
-
+        do {
+            printf("Ingresa una palabra de 5 letras: ");
+            fgets(input, sizeof(input), stdin);
+            input[strcspn(input, "\n")] = 0;
+        
+            if (strlen(input) != 5) {
+                printf("❌ Error: la palabra debe tener exactamente 5 letras.\n");
+            }
+        } while (strlen(input) != 5);
+        
         send(sock, input, strlen(input), 0);
+        
         int valread = read(sock, buffer, BUFFER_SIZE);
         buffer[valread] = '\0';
         printf("Servidor responde: %s\n", buffer);
