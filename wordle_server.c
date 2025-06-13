@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <ctype.h>  // Mayus y minus
 
 #define MAX_CONN 5
 #define MAX_WORD_LEN 6
@@ -28,6 +29,12 @@ void evaluar_palabra(const char *secreta, const char *intento, char *resultado) 
         }
     }
     resultado[len] = '\0';
+}
+
+void convertir_a_mayusculas(char *str) {
+    for (int i = 0; str[i]; i++) {
+        str[i] = toupper((unsigned char)str[i]);
+    }
 }
 
 void catch(int sig) {
@@ -81,7 +88,8 @@ int main(int argc, char *argv[]) {
         memset(buffer, 0, sizeof(buffer));
         int valread = recv(descriptor_socket_cliente, buffer, BUFFER_SIZE, 0);
         if (valread <= 0) break;
-
+        
+        convertir_a_mayusculas(buffer);
         printf("Cliente dijo: %s\n", buffer);
         evaluar_palabra(secret_word, buffer, resultado);
         send(descriptor_socket_cliente, resultado, strlen(resultado), 0);
