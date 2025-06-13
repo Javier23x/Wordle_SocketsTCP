@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <time.h>
 #include <ctype.h>  // Mayus y minus
 
 #define MAX_CONN 5
@@ -70,7 +71,9 @@ int main(int argc, char *argv[]) {
     char buffer[BUFFER_SIZE];
     char resultado[MAX_WORD_LEN + 1];
     srand(time(NULL));
-    char secret_word[MAX_WORD_LEN + 1] = strcpy(secret_word, palabras[rand() % TOTAL_PALABRAS]);;
+    char secret_word[MAX_WORD_LEN + 1];
+    strcpy(secret_word, palabras[rand() % TOTAL_PALABRAS]);
+
 
     signal(SIGINT, catch);
 
