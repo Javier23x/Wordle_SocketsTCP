@@ -74,7 +74,6 @@ int main(int argc, char *argv[]) {
     char secret_word[MAX_WORD_LEN + 1];
     strcpy(secret_word, palabras[rand() % TOTAL_PALABRAS]);
 
-
     signal(SIGINT, catch);
 
     descriptor_socket_servidor = socket(AF_INET, SOCK_STREAM, 0);
@@ -102,6 +101,7 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Cliente conectado desde %s\n", inet_ntoa(socket_cliente.sin_addr));
+    printf("🔐 Palabra secreta elegida: %s\n", secret_word);
 
     while (1) {
         memset(buffer, 0, sizeof(buffer));
@@ -112,6 +112,11 @@ int main(int argc, char *argv[]) {
         printf("Cliente dijo: %s\n", buffer);
         evaluar_palabra(secret_word, buffer, resultado);
         send(descriptor_socket_cliente, resultado, strlen(resultado), 0);
+
+        if (strcmp(resultado, "GGGGG") == 0) {
+            printf("✅ Cliente acertó la palabra. Cerrando conexión.\n");
+            break;
+        }
     }
 
     close(descriptor_socket_cliente);

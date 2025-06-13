@@ -55,6 +55,12 @@ int main(int argc, char *argv[]) {
         int valread = read(sock, buffer, BUFFER_SIZE);
         buffer[valread] = '\0';
         printf("Servidor responde: %s\n", buffer);
+
+        // Si acertó, mostrar mensaje y cerrar
+        if (strcmp(buffer, "GGGGG") == 0) {
+            printf("🎉 ¡Acertaste la palabra!\n");
+            break;
+        }
     }
 
     close(sock);
