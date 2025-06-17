@@ -1,6 +1,6 @@
 # 🟨 Wordle_SocketsTCP
 
-Aplicación cliente-servidor implementada en C usando **sockets TCP**, que simula el popular juego Wordle. Desarrollado para la asignatura **Redes de Computadores 2025** utilizando **máquinas virtuales Ubuntu con VirtualBox**.
+Aplicación cliente-servidor implementada en C usando **sockets TCP**, que simula una versión simple del popular juego Wordle. Desarrollado para utilizarse en **máquinas virtuales Ubuntu con VirtualBox**.
 
 ---
 
